@@ -11,7 +11,7 @@ plugins {
 
 extra["springCloudVersion"] = "2022.0.0"
 
-group = "org.uqbar"
+group = "GomezLeandro"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_17
 java.targetCompatibility = JavaVersion.VERSION_17
@@ -86,7 +86,7 @@ tasks.jacocoTestReport {
     )
     reports {
         xml.required.set(true)
-        csv.required.set(false)
+        csv.required.set(true)
         html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
     }
 }
