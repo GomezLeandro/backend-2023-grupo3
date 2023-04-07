@@ -40,8 +40,11 @@ dependencies {
     //implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
     // testing
-    testImplementation("com.h2database:h2:2.1.214")
+    val kotestVersion = "5.4.2"
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("io.mockk:mockk:1.12.8")
+    testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
+    testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
 }
 
 dependencyManagement {
