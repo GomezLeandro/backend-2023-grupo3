@@ -36,8 +36,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-devtools")
 
     // conexión a la base de datos
-    implementation("org.postgresql:postgresql:42.5.3")
-    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+   // implementation("org.postgresql:postgresql:42.5.3")
+    //implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
     // testing
     testImplementation("com.h2database:h2:2.1.214")
