@@ -1,37 +1,74 @@
-# Ejemplo base para TP Algo3
 
-[![Build](https://github.com/algo3-unsam/proyecto-base-tp/actions/workflows/build.yml/badge.svg)](https://github.com/GomezLeandro/backend-2023-grupo3/actions/workflows/build.yml) ![Coverage](./.github/badges/jacoco.svg)
+# Spring Boot - Politics - Mapeo OR/M
 
-- El build de Github Actions funciona de una, no tenés que configurar nada
-- También el coverage se genera solito si respetás las dependencias que están en el `build.gradle.kts`
-- en el archivo [settings.gradle.kts](./settings.gradle.kts) que está en el raíz tenés que cambiarle al nombre de tu proyecto
+[![build](https://github.com/uqbar-project/eg-politics-springboot-kotlin/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/uqbar-project/eg-politics-springboot/actions/workflows/build.yml) [![codecov](https://codecov.io/gh/uqbar-project/eg-politics-springboot-kotlin/branch/master/graph/badge.svg)](https://codecov.io/gh/uqbar-project/eg-politics-springboot-kotlin)
 
-```kts
-rootProject.name = "proyecto-base-tp"
+## Prerrequisitos
+
+Solo hace falta tener instalado Docker Desktop (el pack docker engine y docker compose), seguí las instrucciones de [esta página](https://phm.uqbar-project.org/material/software) en el párrafo `Docker`.
+
+
+```bash
+docker compose up
 ```
 
-- Para los badges de build y coverage (las imágenes que ves con el build passing y el % en este README), tenés que reemplazar `tp-recetas-2020-gr-xx` por el repositorio correspondiente.
+Eso levanta tanto PostgreSQL como el cliente pgAdmin, como está explicado en [este ejemplo](https://github.com/uqbar-project/eg-manejo-proyectos-sql).
 
-## El proyecto
+La conexión a la base se configura en el archivo [`application.yml`](./src/main/resources/application.yml):
 
-Antes que nada, la idea de este proyecto es que te sirva como base para poder desarrollar el backend en la materia [Algoritmos 3](https://algo3.uqbar-project.org/). Por eso está basado en _Maven_, y el archivo `build.gradle.kts` tiene dependencias a
+```yml
+  datasource:
+    url: jdbc:postgresql://0.0.0.0:5432/politics
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+```
 
-- Spring Boot
-- JUnit 5
-- JaCoCo (Java Code Coverage), para que agregues el % de cobertura en el README
-- Swagger, para documentar tus endpoints
-- la versión de Kotlin que estaremos usando
-- además de estar basado en la JDK 14
+- `0.0.0.0` apunta a nuestro contenedor de Docker
+- el usuario y contraseña está definido en el archivo `docker-compose.yml`
 
-### Pasos para adaptar tu proyecto de Algo2 a Algo3
+## Material relacionado
 
-El proceso más simple para que puedan reutilizar el proyecto de Algo2 en Algo3 es:
+- [Apunte con la explicación completa](https://docs.google.com/document/d/13vAmPKbWfWpRWze3AhLwnCHfWktfIIXnju3PD_tzyW4/edit)
 
-- generar una copia de todo el directorio que contiene este proyecto
-- eliminar la carpeta `.git` que está oculta
-- copian del proyecto de Algo2 las carpetas `src/main/kotlin` y `src/test/kotlin` y la ubican en el mismo lugar en el proyecto de Algo3
+## Swagger - Open API
 
-El proyecto tiene un main, en la clase `ProyectoApplication`, que levantará el servidor web en el puerto 9000, tienen que renombrarlo al TP actual. También tenés
+Un chiche interesante es que pueden explorar y testear con Swagger el presente ejemplo, levantando la aplicación y navegando en la siguiente URL:
 
-- un endpoint de ejemplo, que viene configurado con la anotación de Swagger (`@ApiOperation`)
-- un test de integración de ejemplo (en `src/test/kotlin`)
+http://localhost:8080/swagger-ui/index.html#/
+
+[Swagger](https://swagger.io/) busca los controllers y arma un entorno web para probar los endpoints (puede resultar más cómodo que POSTMAN sobre todo para métodos POST o PUT).
+
+Para conseguir el mismo efecto en tu proyecto solo tenés que agregar dos dependencias:
+
+```kts
+implementation("org.springdoc:springdoc-openapi-ui:1.6.14")
+```
+
+Luego en los controllers la annotation `@Operation` es la que permite agregar una descripción al endpoint
+
+```kt
+@GetMapping("/zonas")
+@Operation(summary = "Devuelve todas las zonas de votación")
+@JsonView(View.Zona.Plana::class)
+fun getZonas(): Iterable<Zona> = zonaService.getZonas()
+```
+
+que luego tomará Swagger para publicar en la página.
+
+![swagger](./images/swagger.png)
+
+## Testeo de integración
+
+Podés ver la implementación de varios casos de prueba:
+
+- para el controller de zonas
+    - al traer todas las zonas no trae las personas candidatas
+    - al traer una zona trae todas las personas candidatas (para este caso de prueba necesitamos convertir el JSON a una clase DTO especial para el test, ya que la serialización se hace con una clase ZonaParaGrillaSerializer en lugar de manejar el mapeo con anotaciones de Jackson o un DTO, quizás una razón más para utilizar como técnica el DTO)
+    - si buscamos una zona inexistente debe devolver código de http 404
+- para el controller de candidates
+    - si actualizamos un candidate mediante un PUT eso se refleja en la base de datos. Dado que tiene efecto colateral **debemos utilizar la anotación @Transactional para este test**. Si bien utilizamos una base de datos in-memory y podríamos pensar "los cambios realmente no persisten", sí lo hacen en el contexto de los tests. Es decir, si repetimos el mismo test sin revertir el cambio, el primer test pasará correctamente **y el segundo fallará cuando espere que nuestro candidate tenga 0 votos**.
+  
+## Cómo testear la app
+
+Podés descargarte [este archivo json](Insomnia_Politics.json) para importarlo en Insomnia.

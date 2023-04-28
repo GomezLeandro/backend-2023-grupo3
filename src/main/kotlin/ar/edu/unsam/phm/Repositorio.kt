@@ -1,8 +1,12 @@
 package ar.edu.unsam.phm
 
 
-
+import ar.edu.unsam.phm.controller.FiltroHospedaje
+import ar.edu.unsam.phm.controller.UsuarioLogin
 import org.springframework.stereotype.Component
+import java.time.LocalDate
+import java.util.NoSuchElementException
+
 @Component
 open class Repositorio<Elemento: Datos> {
 
@@ -23,6 +27,7 @@ open class Repositorio<Elemento: Datos> {
             throw BusinessException("El elemento no puede ser creado porque ya existe dicho usuario")
         }
     }
+
 
     fun agregarAlRepo(elemento: Elemento){
         elementos.add(elemento)
@@ -53,7 +58,7 @@ open class Repositorio<Elemento: Datos> {
 
     private fun excepcionPorNoExistenciaEnRepo(idABuscar: Int){
         if(!estaEnRepo(idABuscar)){
-            throw BusinessException("No existe un Usuario con dicho ID")
+            throw NotFoundException("No existe un Usuario con dicho ID")
         }
     }
 
@@ -65,19 +70,49 @@ open class Repositorio<Elemento: Datos> {
     fun buscar(cadena: String) = elementos.filter { it.coincidencia(cadena) }
 
 
+
 }
 
 
 
 @Component
 class RepositorioDeHospedajes : Repositorio<Hospedaje>() {
-    fun mostrarTodosLosHospedajes (): List<Hospedaje> = elementos
 
+    fun getHospedajesFiltrados(
+        destino: String?,
+        fechaDesde: LocalDate,
+        fechaHasta: LocalDate,
+        pasajeros: Int?,
+        puntaje: Int
+    ): List<Hospedaje>{
 
+        return elementos.filter{
+                    it.porDestino(destino) &&
+                    it.porCantPasajeros(pasajeros) &&
+                    it.disponible(fechaDesde,fechaHasta) &&
+                            it.porPuntaje(puntaje)
+        }
+    }
 }
+@Component
 
-class
-RepositorioDeUsuarios : Repositorio<Usuario>(){
+class RepositorioDeUsuarios : Repositorio<Usuario>(){
+    fun buscarIntentoLogueo(user: UsuarioLogin):Int{
+        try {
+            var usuarioLogeadoEncontrado = elementos.first { it.username == user.username && it.contrasenia == user.contrasena }
+            return usuarioLogeadoEncontrado.id
+        }catch (e:NoSuchElementException){
+            throw NoAutenticadoException("Usuario y/o contraseña incorrecto. Verifique que haya ingresado bien")
+        }
+    }
+    fun encontrarAmigos(identificador: Int):MutableSet<Usuario>{
+        val usuarioAux= this.buscarPorId(identificador)
+        return usuarioAux.amigos
+    }
 
+    fun encontrarReservasCompradas(id: Int): MutableList<Hospedaje>{
+        val usuarioAux= this.buscarPorId(id)
+        return usuarioAux.reservasCompradas
+    }
 
 }

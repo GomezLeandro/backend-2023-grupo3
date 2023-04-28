@@ -11,7 +11,7 @@ plugins {
 
 extra["springCloudVersion"] = "2022.0.0"
 
-group = "GomezLeandro"
+group = "org.uqbar"
 version = "0.0.1-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_17
 java.targetCompatibility = JavaVersion.VERSION_17
@@ -36,15 +36,12 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-devtools")
 
     // conexión a la base de datos
-   // implementation("org.postgresql:postgresql:42.5.3")
-    //implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.postgresql:postgresql:42.5.3")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 
     // testing
-    val kotestVersion = "5.4.2"
+    testImplementation("com.h2database:h2:2.1.214")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-    testImplementation("io.mockk:mockk:1.12.8")
-    testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
-    testImplementation("io.kotest:kotest-assertions-core:$kotestVersion")
 }
 
 dependencyManagement {
@@ -86,7 +83,7 @@ tasks.jacocoTestReport {
     )
     reports {
         xml.required.set(true)
-        csv.required.set(true)
+        csv.required.set(false)
         html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
     }
 }

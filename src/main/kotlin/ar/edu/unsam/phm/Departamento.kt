@@ -1,5 +1,8 @@
 package ar.edu.unsam.phm
 
+import com.fasterxml.jackson.annotation.JsonTypeName
+
+@JsonTypeName(value = "departamento")
 class Departamento(precioBase: Double) : Hospedaje(precioBase) {
 
     override fun plus(): Double{

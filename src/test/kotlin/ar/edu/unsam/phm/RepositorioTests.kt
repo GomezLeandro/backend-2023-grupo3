@@ -1,8 +1,6 @@
 package ar.edu.unsam.phm
 
-import ar.edu.unsam.phm.BusinessException
-import ar.edu.unsam.phm.Repositorio
-import ar.edu.unsam.phm.Usuario
+
 import org.junit.jupiter.api.*
 import java.time.LocalDate
 
@@ -19,9 +17,9 @@ import java.time.LocalDate
 
         @BeforeEach
         fun init(){
-            usuario1 = Usuario(nombre="Leandro",apellido="Gomez",username="Lgomez",contrasenia="1234",fechaDeNacimiento=LocalDate.of(1985, 9, 30),paisDeOrigen="Argentina",saldo=3000.00)
-            usuario2 = Usuario(nombre="Rodrigo",apellido="Nieto",username="Rnieto",contrasenia="1234",fechaDeNacimiento=LocalDate.of(1990, 1, 15),paisDeOrigen="Argentina",saldo=5000.00)
-            usuario3 = Usuario(nombre="Dario",apellido="Albelo",username="Lobito",contrasenia="1234",fechaDeNacimiento=LocalDate.of(1990, 3, 25),paisDeOrigen="Sudafrica",saldo=9500.00)
+            usuario1 = Usuario(nombre="Leandro",apellido="Gomez",username="Lgomez",contrasenia="1234",fechaDeNacimiento=LocalDate.of(1985, 9, 30),paisDeOrigen="Argentina","",saldo=3000.00)
+            usuario2 = Usuario(nombre="Rodrigo",apellido="Nieto",username="Rnieto",contrasenia="1234",fechaDeNacimiento=LocalDate.of(1990, 1, 15),paisDeOrigen="Argentina","",saldo=5000.00)
+            usuario3 = Usuario(nombre="Dario",apellido="Albelo",username="Lobito",contrasenia="1234",fechaDeNacimiento=LocalDate.of(1990, 3, 25),paisDeOrigen="Sudafrica","",saldo=9500.00)
             repoDeUsuario = Repositorio<Usuario>()
             repoDeUsuario.crear(usuario1)
             repoDeUsuario.crear(usuario2)
